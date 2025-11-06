@@ -10,8 +10,16 @@ package sebas.lab07_refactoring;
  */
 public class OrderService {
 
+    private static final double TAX_RATE = 0.18;
+
     public void processOrder(Order order) {
-        // Validar orden
+        validateOrder(order);
+        double total = calculateOrderTotal(order);
+        saveOrder(order, total);
+        sendConfirmation(order, total);
+    }
+
+    private void validateOrder(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Order cannot be null");
         }
@@ -21,22 +29,26 @@ public class OrderService {
         if (order.getCustomer() == null) {
             throw new IllegalArgumentException("Order must have a customer");
         }
+    }
 
-        // Calcular total
+    private double calculateOrderTotal(Order order) {
         double subtotal = 0;
         for (OrderItem item : order.getItems()) {
             subtotal += item.getPrice() * item.getQuantity();
         }
-        double tax = subtotal * 0.18;
+        double tax = subtotal * TAX_RATE;
         double total = subtotal + tax;
         order.setTotal(total);
+        return total;
+    }
 
-        // Guardar orden
+    private void saveOrder(Order order, double total) {
         System.out.println("Saving order to database...");
         System.out.println("Order ID: " + order.getId());
         System.out.println("Total: " + total);
+    }
 
-        // Enviar confirmación
+    private void sendConfirmation(Order order, double total) {
         System.out.println("Sending confirmation message to: "
                 + order.getCustomer().getFormattedPhone());
         System.out.println("Dear " + order.getCustomer().getName());
